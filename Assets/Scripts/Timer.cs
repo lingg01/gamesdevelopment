@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System;
+using UnityEngine.SceneManagement;
 
 public class Timer : MonoBehaviour
 {
@@ -23,6 +24,8 @@ public class Timer : MonoBehaviour
 
             //game over when timer hits 0
             timerText.color = Color.red;
+            SceneManager.LoadScene("GameOver");
+            Time.timeScale = 1;
         }
         
         int minutes = Mathf.FloorToInt(remainingTime / 60);

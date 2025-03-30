@@ -3,30 +3,38 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour {
-  // Allows you to hold down a key for movement.
+
   [SerializeField] private bool isRepeatedMovement = false;
-  // Time in seconds to move between one grid position and the next.
+  //time to move from one grid to another
   [SerializeField] private float moveDuration = 0.1f;
-  // The size of the grid
   [SerializeField] private float gridSize = 1f;
+
+  public BranchManager bm;
+  private Camera mainCamera;
 
   private bool isMoving = false;
 
+  System.Func<KeyCode, bool> inputFunction;
+
+  void Start()
+  {
+    mainCamera = Camera.main;
+  }
+
   // Update is called once per frame
   private void Update() {
-    // Only process on move at a time.
+    // Only one movement at a time
     if (!isMoving) {
-      // Accomodate two different types of moving.
-      System.Func<KeyCode, bool> inputFunction;
+    
       if (isRepeatedMovement) {
-        // GetKey repeatedly fires.
         inputFunction = Input.GetKey;
-      } else {
-        // GetKeyDown fires once per keypress
+      } 
+      
+      else {
         inputFunction = Input.GetKeyDown;
       }
 
-      // If the input function is active, move in the appropriate direction.
+      //input keys
       if (inputFunction(KeyCode.UpArrow)) {
         StartCoroutine(Move(Vector2.up));
       } else if (inputFunction(KeyCode.DownArrow)) {
@@ -37,18 +45,36 @@ public class PlayerMovement : MonoBehaviour {
         StartCoroutine(Move(Vector2.right));
       }
     }
+
+        // Get player input
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+
+        // Restrict player in game screen
+        RestrictPlayerWithinBounds();
+
+        //Flip character when direction is changed
+        if (inputFunction(KeyCode.RightArrow)) // Move right
+        {
+            Flip(true);
+        }
+        else if (inputFunction(KeyCode.LeftArrow)) // Movie eft
+        {
+            Flip(false);
+        }
+
   }
 
-  // Smooth movement between grid positions.
+  // Movement from one grid to another
   private IEnumerator Move(Vector2 direction) {
     // Record that we're moving so we don't accept more input.
     isMoving = true;
 
-    // Make a note of where we are and where we are going.
+    // Record current position and next position
     Vector2 startPosition = transform.position;
     Vector2 endPosition = startPosition + (direction * gridSize);
 
-    // Smoothly move in the desired direction taking the required time.
+    // Move in input direction in time
     float elapsedTime = 0;
     while (elapsedTime < moveDuration) {
       elapsedTime += Time.deltaTime;
@@ -57,10 +83,47 @@ public class PlayerMovement : MonoBehaviour {
       yield return null;
     }
 
-    // Make sure we end up exactly where we want.
+    // Ensure correct position
     transform.position = endPosition;
 
-    // We're no longer moving so we can accept another move input.
+    // Another input accepted
     isMoving = false;
   }
+
+    // Destroy branch and enemy when player collides
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Branch"))
+        {
+            Destroy(other.gameObject);
+            bm.branchCount++;
+        }
+
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            Destroy(other.gameObject);
+        }
+    }
+
+    void RestrictPlayerWithinBounds()
+    {
+        // Get the camera's viewport position
+        Vector3 viewportPos = mainCamera.WorldToViewportPoint(transform.position);
+
+        // Clamp the viewport position between 0 and 1
+        viewportPos.x = Mathf.Clamp(viewportPos.x, 0.05f, 0.955f); 
+        viewportPos.y = Mathf.Clamp(viewportPos.y, 0.12f, 0.9f);
+
+        // Convert back to world space
+        transform.position = mainCamera.ViewportToWorldPoint(viewportPos);
+    }
+
+    void Flip(bool isFacingRight)
+    {
+        // If moving right, scale is positive; if left, flip it
+        Vector3 localScale = transform.localScale;
+        localScale.x = isFacingRight ? Mathf.Abs(localScale.x) : -Mathf.Abs(localScale.x);
+        transform.localScale = localScale;
+    }
+
 }

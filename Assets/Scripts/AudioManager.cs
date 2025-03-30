@@ -10,11 +10,20 @@ public class AudioManager : MonoBehaviour
 
     [Header("---------- Audio Clip ----------")]
     public AudioClip BGM_01;
+    public AudioClip button;
+    public AudioClip touchEnemy;
+    public AudioClip touchBranch;
+    public AudioClip celebrate;
 
     private void start()
     {
         musicSource.clip = BGM_01;
         musicSource.Play();
+    }
+
+    public void PlaySFX(AudioClip clip)
+    {
+        SFXSource.PlayOneShot(clip);
     }
 
 }

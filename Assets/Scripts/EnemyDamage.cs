@@ -26,7 +26,7 @@ public class EnemyDamage : MonoBehaviour
             playerHealth = GameObject.Find("Player").GetComponent<PlayerHealth>();
 
             playerHealth.TakeDamage(damage);
-            Debug.Log("Collided with player");
+            // Debug.Log("Collided with player");
         }
     }
 }

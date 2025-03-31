@@ -10,13 +10,13 @@ public class PlayerMovement : MonoBehaviour {
   [SerializeField] private float gridSize = 1f;
 
   public BranchManager bm;
+  AudioManager audioManager;
   private Camera mainCamera;
 
   private bool isMoving = false;
 
   System.Func<KeyCode, bool> inputFunction;
 
-  AudioManager audioManager;
 
   private void Awake()
   {
@@ -65,7 +65,7 @@ public class PlayerMovement : MonoBehaviour {
         {
             Flip(true);
         }
-        else if (inputFunction(KeyCode.LeftArrow)) // Movie eft
+        else if (inputFunction(KeyCode.LeftArrow)) // Movie left
         {
             Flip(false);
         }

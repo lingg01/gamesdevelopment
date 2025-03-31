@@ -16,6 +16,13 @@ public class PlayerMovement : MonoBehaviour {
 
   System.Func<KeyCode, bool> inputFunction;
 
+  AudioManager audioManager;
+
+  private void Awake()
+  {
+    audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+  }
+
   void Start()
   {
     mainCamera = Camera.main;
@@ -97,11 +104,13 @@ public class PlayerMovement : MonoBehaviour {
         {
             Destroy(other.gameObject);
             bm.branchCount++;
+            audioManager.PlaySFX(audioManager.touchBranch);
         }
 
         if (other.gameObject.CompareTag("Enemy"))
         {
             Destroy(other.gameObject);
+            audioManager.PlaySFX(audioManager.touchEnemy);
         }
     }
 

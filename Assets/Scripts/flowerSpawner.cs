@@ -5,39 +5,61 @@ using UnityEngine;
 public class flowerSpawner : MonoBehaviour
 {
 
-    public Transform[] spawnPoints;
     public GameObject[] flowerPrefabs;
-    [SerializeField] float secondSpawn = 10f;
-    [SerializeField] float minFlower;
-    [SerializeField] float maxFlower;
-    public Vector3 minVector;
-    public Vector3 maxVector;
-    public Vector3 randomVector;
+    public float spawnInterval = 1f;
+    public float minX = -5f;
+    public float maxX = 5f; 
+    public float spawnHeight = 10f; // y pos that item will drop from
+    public float yThreshold = 0f;
+    public float lifetime = 5f;
+
+    private List<GameObject> spawnedFlowers = new List<GameObject>();
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        minVector = new Vector3(0, 500, 0);
-        maxVector = new Vector3(500, 500, 0);
-        randomVector = new Vector3 (
-            Random.Range(minVector.x, maxVector.x),
-            Random.Range(minVector.y, maxVector.y),
-            Random.Range(minVector.z, maxVector.z)
-        );
-
-        StartCoroutine(flowerSpawn());
+        InvokeRepeating("flowerSpawn", 0f, spawnInterval);
+        // StartCoroutine(DestroyAfterDelay());
     }
 
-IEnumerator flowerSpawn()
-{
-    for (int i = 0; i < 50; i++)
+        void flowerSpawn()
     {
-        var wanted = Random.Range(minFlower, maxFlower);
-        var position = new Vector3 (wanted, transform.position.y);
-        GameObject gameObject = Instantiate(flowerPrefabs[Random.Range(0, flowerPrefabs.Length)], randomVector, Quaternion.identity);
-        yield return new WaitForSeconds(secondSpawn);
-        Destroy(gameObject, 10f);
+        // Generate a random X position within the specified range
+        float randomX = Random.Range(minX, maxX);
+
+        // Set the spawn position (use fixed Y position for the drop height)
+        Vector3 spawnPosition = new Vector3(randomX, spawnHeight, 5f);
+
+        // Instantiate the item at the random position
+        GameObject flower = Instantiate(flowerPrefabs[Random.Range(0, flowerPrefabs.Length)], spawnPosition, Quaternion.identity);
+        
     }
-}
+
+        void Update()
+    {
+        // Check the position of all spawned items each frame
+        for (int i = 0; i < spawnedFlowers.Count; i++)
+        {
+            // If the spawned item is below the threshold, destroy it
+            if (spawnedFlowers[i].transform.position.y < yThreshold)
+            {
+                Destroy(spawnedFlowers[i]);
+                spawnedFlowers.RemoveAt(i); // Remove destroyed item from the list
+                i--; // Adjust index after removal
+            }
+        }
+    }
+
+    //     IEnumerator DestroyAfterDelay()
+    // {
+    //     // Wait for the specified amount of time
+    //     yield return new WaitForSeconds(lifetime);
+        
+    //     // Destroy the prefab after the delay
+    //     Destroy(gameObject);
+    // }
 
 }
+
+
+

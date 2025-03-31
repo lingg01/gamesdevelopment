@@ -37,7 +37,7 @@ public class BranchManager : MonoBehaviour
     {
         scoreText.text = "Score: " + branchCount.ToString();
 
-        if(branchCount == 6)
+        if(branchCount == 18)
         {
             SceneManager.LoadScene("GameOver");
             Time.timeScale = 1;
